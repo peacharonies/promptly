@@ -1,7 +1,27 @@
 [
-  "Write about a character who discovers they can hear plants talking",
-  "Describe a world where colors have gone extinct",
-  "What if gravity worked differently on Tuesdays?",
-  "Create a story about the last bookstore on Earth",
-  "Write from the perspective of a forgotten memory"
+  {
+    "id": 1,
+    "prompt": "Write about a character who discovers they can hear plants talking",
+    "tags": ["fantasy", "nature", "dialogue"]
+  },
+  {
+    "id": 2,
+    "prompt": "Describe a world where colors have gone extinct",
+    "tags": ["dystopian", "sensory", "worldbuilding"]
+  },
+  {
+    "id": 3,
+    "prompt": "What if gravity worked differently on Tuesdays?",
+    "tags": ["science fiction", "humor", "physics"]
+  },
+  {
+    "id": 4,
+    "prompt": "Create a story about the last bookstore on Earth",
+    "tags": ["post-apocalyptic", "books", "nostalgia"]
+  },
+  {
+    "id": 5,
+    "prompt": "Write from the perspective of a forgotten memory",
+    "tags": ["psychological", "introspective", "memory"]
+  }
 ]
