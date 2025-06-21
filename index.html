@@ -213,11 +213,11 @@
                 currentPromptIndex = randomIndex;
                 const selectedPrompt = promptsCache[randomIndex];
 
-                // Validate prompt structure - expect simple string or object with text property
-                const promptContent = typeof selectedPrompt === 'string' ? selectedPrompt : selectedPrompt.text;
+                // Validate prompt structure - expect object with prompt property
+                const promptContent = selectedPrompt.prompt;
                 
                 if (!promptContent) {
-                    throw new Error('Invalid prompt format');
+                    throw new Error('Invalid prompt format - missing "prompt" field');
                 }
 
                 // Update display with fade animation
