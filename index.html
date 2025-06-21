@@ -308,7 +308,12 @@
 
                 // Update display with fade animation
                 setTimeout(() => {
-                    promptText.textContent = promptContent;
+                    // Add quotation marks for dialogue prompts
+                    if (currentPromptType === 'dialogue') {
+                        promptText.textContent = `"${promptContent}"`;
+                    } else {
+                        promptText.textContent = promptContent;
+                    }
 
                     // Remove loading state and add fade-in animation
                     container.classList.remove('loading');
