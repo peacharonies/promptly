@@ -54,6 +54,38 @@
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
+        .character-input-container {
+            position: fixed;
+            top: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9;
+        }
+
+        .character-input {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .character-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .character-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             min-height: 100vh;
@@ -63,7 +95,7 @@
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
-            padding-top: 100px;
+            padding-top: 180px;
         }
 
         .background {
@@ -187,7 +219,17 @@
         /* Mobile optimizations */
         @media (max-width: 768px) {
             body {
-                padding-top: 120px;
+                padding-top: 200px;
+            }
+            
+            .character-input-container {
+                top: 100px;
+            }
+            
+            .character-input {
+                width: 180px;
+                padding: 10px 16px;
+                font-size: 0.85rem;
             }
             
             .nav-bar {
@@ -215,11 +257,21 @@
 
         @media (max-width: 480px) {
             body {
-                padding-top: 140px;
+                padding-top: 220px;
             }
             
             .nav-container {
                 top: 20px;
+            }
+            
+            .character-input-container {
+                top: 110px;
+            }
+            
+            .character-input {
+                width: 160px;
+                padding: 8px 14px;
+                font-size: 0.8rem;
             }
             
             .nav-item {
@@ -247,6 +299,10 @@
         </nav>
     </div>
     
+    <div class="character-input-container">
+        <input type="text" id="character-name" class="character-input" placeholder="Character name..." maxlength="30">
+    </div>
+    
     <div class="background"></div>
     
     <div class="quote-container">
@@ -260,6 +316,7 @@
         let currentPromptIndex = -1;
         let promptsCache = {};
         let currentPromptType = 'one';
+        let currentOriginalPrompt = '';
 
         async function loadRandomPrompt() {
             const promptText = document.getElementById('quote-text');
@@ -306,14 +363,12 @@
                     throw new Error('Invalid prompt format - missing "prompt" field');
                 }
 
+                // Store original prompt for character name replacements
+                currentOriginalPrompt = promptContent;
+
                 // Update display with fade animation
                 setTimeout(() => {
-                    // Add quotation marks for dialogue prompts
-                    if (currentPromptType === 'dialogue') {
-                        promptText.textContent = `"${promptContent}"`;
-                    } else {
-                        promptText.textContent = promptContent;
-                    }
+                    updatePromptDisplay();
 
                     // Remove loading state and add fade-in animation
                     container.classList.remove('loading');
@@ -334,6 +389,25 @@
                 
                 container.classList.remove('loading');
                 button.textContent = 'Try Again';
+            }
+        }
+
+        function updatePromptDisplay() {
+            const promptText = document.getElementById('quote-text');
+            let displayText = currentOriginalPrompt;
+            
+            // Replace "Character" with user input if provided
+            const characterName = document.getElementById('character-name').value.trim();
+            if (characterName) {
+                // Replace "Character" case-insensitively
+                displayText = displayText.replace(/\bcharacter\b/gi, characterName);
+            }
+            
+            // Add quotation marks for dialogue prompts
+            if (currentPromptType === 'dialogue') {
+                promptText.textContent = `"${displayText}"`;
+            } else {
+                promptText.textContent = displayText;
             }
         }
 
@@ -362,6 +436,14 @@
                     const type = this.getAttribute('data-type');
                     switchPromptType(type);
                 });
+            });
+            
+            // Add character name input listener
+            document.getElementById('character-name').addEventListener('input', function() {
+                // Update current prompt display when character name changes
+                if (currentOriginalPrompt) {
+                    updatePromptDisplay();
+                }
             });
             
             // Small delay for better loading experience
