@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Prompts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .quote-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 60px 40px;
+            max-width: 700px;
+            margin: 20px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .quote-container:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .quote-text {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            line-height: 1.6;
+            margin-bottom: 40px;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            color: #ffffff;
+            position: relative;
+            min-height: 3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+
+        .new-quote-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 0.95rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .new-quote-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .new-quote-btn:hover::before {
+            left: 100%;
+        }
+
+        .new-quote-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .new-quote-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            opacity: 0.6;
+        }
+
+        .loading .quote-text {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .error-state {
+            color: rgba(255, 119, 119, 0.8);
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .quote-container {
+                padding: 40px 30px;
+                margin: 15px;
+                border-radius: 20px;
+            }
+            
+            .new-quote-btn {
+                padding: 14px 28px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .quote-container {
+                padding: 30px 20px;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="quote-container">
+        <div id="quote-text" class="quote-text">Loading prompt...</div>
+        <button id="new-quote-btn" class="new-quote-btn" onclick="loadRandomPrompt()">
+            New Prompt
+        </button>
+    </div>
+
+    <script>
+        let currentPromptIndex = -1;
+        let promptsCache = null;
+
+        async function loadRandomPrompt() {
+            const promptText = document.getElementById('quote-text');
+            const button = document.getElementById('new-quote-btn');
+            const container = document.querySelector('.quote-container');
+
+            try {
+                // Add loading state
+                container.classList.add('loading');
+                button.textContent = 'Loading...';
+                
+                // Clear error states
+                promptText.classList.remove('error-state');
+
+                // Fetch prompts from external JSON file (cache after first load)
+                if (!promptsCache) {
+                    const response = await fetch('prompts.json');
+                    if (!response.ok) {
+                        throw new Error(`Failed to load prompts: ${response.status}`);
+                    }
+                    promptsCache = await response.json();
+                }
+                
+                // Validate prompts data
+                if (!Array.isArray(promptsCache) || promptsCache.length === 0) {
+                    throw new Error('Invalid prompts data format');
+                }
+                
+                // Get random prompt (ensure it's different from current one)
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * promptsCache.length);
+                } while (randomIndex === currentPromptIndex && promptsCache.length > 1);
+
+                currentPromptIndex = randomIndex;
+                const selectedPrompt = promptsCache[randomIndex];
+
+                // Validate prompt structure - expect simple string or object with text property
+                const promptContent = typeof selectedPrompt === 'string' ? selectedPrompt : selectedPrompt.text;
+                
+                if (!promptContent) {
+                    throw new Error('Invalid prompt format');
+                }
+
+                // Update display with fade animation
+                setTimeout(() => {
+                    promptText.textContent = promptContent;
+
+                    // Remove loading state and add fade-in animation
+                    container.classList.remove('loading');
+                    container.classList.remove('fade-in');
+                    // Force reflow
+                    container.offsetHeight;
+                    container.classList.add('fade-in');
+                    
+                    button.textContent = 'New Prompt';
+                }, 200);
+
+            } catch (error) {
+                console.error('Error loading prompt:', error);
+                
+                // Show error state
+                promptText.textContent = 'Unable to load prompts. Please check that prompts.json exists and is properly formatted.';
+                promptText.classList.add('error-state');
+                
+                container.classList.remove('loading');
+                button.textContent = 'Try Again';
+            }
+        }
+
+        // Load initial prompt when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Small delay for better loading experience
+            setTimeout(loadRandomPrompt, 300);
+        });
+
+        // Add keyboard support
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space' || event.code === 'Enter') {
+                event.preventDefault();
+                loadRandomPrompt();
+            }
+        });
+    </script>
+</body>
+</html>
