@@ -27,7 +27,7 @@ Prompt generators to spur inspiration for writing, drawing, or character musing.
 
 
 # Contact Information
-_Name:_ [Jared R. Kannianen](https://www.linkedin.com/in/jarkanni/)
+_Name:_ [Jared R. Kannianen](https://www.peacharonies.com)
 
 
 _Email:_ contact@peacharonies.com
