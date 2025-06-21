@@ -1,7 +1,7 @@
 # Promptly
-Flesh out your characters!
+Flesh out your characters!  From character development to laughs, use these prompts as you wish.
 
-# Explanation
+# Description
 Prompt generators to spur inspiration for writing, drawing, or character musing.
 
 ## Generator Types:
